@@ -148,15 +148,9 @@ class Graph () :
     def dfs (self , i)  :
         self.visited.append(i)
         j=0
-        print("list : " , self.list)
-        print("search " , str(i) , "  in : " , self.list[i])
-        print("visited: " , self.visited)
         for ver in self.list[i] :
-            print("ver :" , ver)
             if ( ver is not '') :
-                 print ("True")
                  if(j in self.visited):
-                     print (j ," was visited !")
                      v = self.list[i]
                      v[j] = ''
                      return False
@@ -177,6 +171,7 @@ class Graph () :
         l = tk.Label(self.frame3, text="loop deleted", font=8)
         l.grid(row=1, column=0, sticky="nsew")
         self.b.destroy()
+
     def findLoop (self , i ) :
 
         self.visited.append(i)
@@ -186,30 +181,31 @@ class Graph () :
             self.findLoop(int(neighbour.state))
         return False
 
+    def findPartOfString(self , currentState , eString) :
+        f = False
+        if eString =="" :
+            return True
+        ch = eString[0]
+        numberOfCurrectEdge =0
 
+        for adj in self.adjacent[currentState]:
+            if ch in adj.a:
+                f = f or self.findPartOfString(int(adj.state) ,eString[1:])
+        if (str(currentState) in self.finishState) and f :
+            return True
+        else:
+            return False
 
     def findString (self , event ) :
         currentState = int(self.startState)
-        f =False
-        for ch in self.e.get() :
-            for adj in self.adjacent[currentState] :
-                if ch in adj.a :
-                    currentState = int(adj.state)
-                    f= True
-            if not f :
-                l = tk.Label(self.frame3, text=" False", fg= "red",  font=8)
-                l.grid(row=0, column=2, sticky="nsew")
-                return
-        if str(currentState) in self.finishState :
+        b = self.findPartOfString(currentState , self.e.get())
+        if b :
             l = tk.Label(self.frame3, text=" True", fg="green", font=8)
             l.grid(row=0, column=2, sticky="nsew")
         else :
             l = tk.Label(self.frame3, text=" False", fg="red", font=8)
             l.grid(row=0, column=2, sticky="nsew")
         return
-
-
-
     def centerWindow(self):
         self.root.withdraw()
         self.root.update_idletasks()  # Update "requested size" from geometry manager
