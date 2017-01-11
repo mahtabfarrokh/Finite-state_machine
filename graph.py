@@ -13,6 +13,8 @@ class Graph () :
         self.finishState = finish
         self.zoomNum = 3
         self.start = False
+        self.imageWidth =0
+        self.imageHeight =0
 
         self.root = tk.Toplevel()
 
@@ -40,7 +42,7 @@ class Graph () :
         self.dot = Digraph(comment='The Round Table')
         if(self.start) :
             check_call(['dot', '-Tgif', 'test-output/round-table.gv', '-o', 'test-output/OutputFile.gif'])
-            photo = tk.PhotoImage(file='test-output/OutputFile.gif')
+            photo = tk.PhotoImage(file='test-output/OutputFile.gif' )
             photo = photo.zoom(3, 3)
             for i in range (int(photo.width()/8)) :
                 for j in range(photo.height()) :
@@ -74,13 +76,15 @@ class Graph () :
                 if (e is not ''):
                     for ch in e.split(','):
                         self.dot.edge(str(i), str(j), ch, constraint='false')
-        print(self.dot.source)
+       # print(self.dot.source)
         self.dot.render('test-output/round-table.gv', view=False)
 
         # draw graph file :
 
         check_call(['dot', '-Tgif', 'test-output/round-table.gv', '-o', 'test-output/OutputFile.gif'])
         photo = tk.PhotoImage(file='test-output/OutputFile.gif' )
+        self.imageWidth = photo.width()
+        self.imageHeight = photo.height()
         photo = photo.zoom(3,3)
         lbl = tk.Label(self.frame, image=photo )
         lbl.image = photo  # keeping a reference in this line
@@ -133,7 +137,6 @@ class Graph () :
         #find loop :
         self.visited = []
         loop =  self.findLoop(0)
-        print(loop)
         if loop :
            l2 = tk.Label(self.frame3, text="There is loop", font=8)
            l2.grid(row=1, column=0, sticky="nsew")
@@ -144,34 +147,36 @@ class Graph () :
             l.grid(row=1 , column=0, sticky="nsew")
     def dfs (self , i)  :
         self.visited.append(i)
-        h = True
         j=0
+        print("list : " , self.list)
+        print("search " , str(i) , "  in : " , self.list[i])
+        print("visited: " , self.visited)
         for ver in self.list[i] :
+            print("ver :" , ver)
             if ( ver is not '') :
+                 print ("True")
                  if(j in self.visited):
+                     print (j ," was visited !")
                      v = self.list[i]
                      v[j] = ''
-                     h = False
+                     return False
                  else:
-                     self.findLoop(j)
+                     self.dfs(j)
             j +=1
-        print(self.list)
-        return h
+        return True
+    def deleteLoopNode (self , i ) :
+        self.visited = []
+        while not self.dfs(i) :
+            self.visited = []
     def deleteLoop (self) :
-        self.visited = []
-        self.dfs(0)
-        self.visited = []
-        while not self.dfs(0) :
-            self.visited = []
-            self.dfs(0)
-            self.visited = []
-        self.dfs(0)
+        self.deleteLoopNode(int(self.startState))
+        for i in range(self.stateNumber) :
+            self.deleteLoopNode(int(i))
         self.makeDotFile()
         self.adjacentListDraw()
         l = tk.Label(self.frame3, text="loop deleted", font=8)
         l.grid(row=1, column=0, sticky="nsew")
         self.b.destroy()
-
     def findLoop (self , i ) :
 
         self.visited.append(i)
