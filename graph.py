@@ -182,16 +182,22 @@ class Graph () :
         return False
 
     def findPartOfString(self , currentState , eString) :
-        f = False
-        if eString =="" :
-            return True
-        ch = eString[0]
-        numberOfCurrectEdge =0
 
+        print("string : " , eString)
+        if eString =="" and (str(currentState) in self.finishState)  :
+            print("vaaaaa")
+            return True
+        elif eString =="" :
+            return False
+        f = False
+        ch = eString[0]
         for adj in self.adjacent[currentState]:
+            print("lisst : " , adj.a)
             if ch in adj.a:
+                print("here : " )
                 f = f or self.findPartOfString(int(adj.state) ,eString[1:])
-        if (str(currentState) in self.finishState) and f :
+                print("f : " , f )
+        if f :
             return True
         else:
             return False
