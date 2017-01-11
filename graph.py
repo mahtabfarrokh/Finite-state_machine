@@ -40,20 +40,6 @@ class Graph () :
     def makeDotFile (self ) :
 
         self.dot = Digraph(comment='The Round Table')
-        if(self.start) :
-            check_call(['dot', '-Tgif', 'test-output/round-table.gv', '-o', 'test-output/OutputFile.gif'])
-            photo = tk.PhotoImage(file='test-output/OutputFile.gif' )
-            photo = photo.zoom(3, 3)
-            for i in range (int(photo.width()/8)) :
-                for j in range(photo.height()) :
-                    photo.put("{white}", to=(i,j))
-                    photo.put("{white}", to=(i + int(photo.width()*7/8) , j))
-                    #to=(photo.width() , photo.height())
-            lbl = tk.Label(self.frame, image=photo, bg="white")
-            lbl.image = photo  # keeping a reference in this line
-            # lbl.pack(side="bottom", fill="both", expand="yes")
-            lbl.grid(row=0, column=0)
-        self.start = True
 
         self.dot.attr('node', shape="point")
         self.dot.node("s")
@@ -82,15 +68,20 @@ class Graph () :
         # draw graph file :
 
         check_call(['dot', '-Tgif', 'test-output/round-table.gv', '-o', 'test-output/OutputFile.gif'])
-        photo = tk.PhotoImage(file='test-output/OutputFile.gif' )
-        self.imageWidth = photo.width()
-        self.imageHeight = photo.height()
+        if (self.imageHeight== 0) :
+            photo = tk.PhotoImage(file='test-output/OutputFile.gif' )
+            self.imageHeight = photo.height()
+            self.imageWidth = photo.width()
+        else:
+            photo = tk.PhotoImage(file='test-output/OutputFile.gif' , width = self.imageWidth , height = self.imageHeight)
         photo = photo.zoom(3,3)
+
         lbl = tk.Label(self.frame, image=photo )
         lbl.image = photo  # keeping a reference in this line
-       # lbl.pack(side="bottom", fill="both", expand="yes")
-
+        lbl.configure(image=photo)
         lbl.grid(row=0, column=0 )
+
+       # lbl.pack(side="bottom", fill="both", expand="yes")
 
 
 
@@ -182,21 +173,15 @@ class Graph () :
         return False
 
     def findPartOfString(self , currentState , eString) :
-
-        print("string : " , eString)
         if eString =="" and (str(currentState) in self.finishState)  :
-            print("vaaaaa")
             return True
         elif eString =="" :
             return False
         f = False
         ch = eString[0]
         for adj in self.adjacent[currentState]:
-            print("lisst : " , adj.a)
             if ch in adj.a:
-                print("here : " )
                 f = f or self.findPartOfString(int(adj.state) ,eString[1:])
-                print("f : " , f )
         if f :
             return True
         else:
