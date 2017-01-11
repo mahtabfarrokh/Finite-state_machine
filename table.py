@@ -8,7 +8,7 @@ class SimpleTableInput(tk.Frame):
         self.rows = rows
         self.columns = columns
         self.root = tk.Tk()
-        # register a command to use for validation
+
         self.centerWindow()
         self.frame = tk.Frame(self.root)
         self.frame.pack()
@@ -37,14 +37,14 @@ class SimpleTableInput(tk.Frame):
     def createTable (self) :
         # create the table of widgets
         for col in range(self.columns) :
-            l = tk.Label(self.frame1 , text = col  , font =10 )
+            l = tk.Label(self.frame1 , text = col  , font =10 ,relief=tk.RIDGE )
             l.grid(row =0  , column = col+1 , stick="nsew")
         for row in range(self.rows+1) :
             if (row ==0 ) :
-                l = tk.Label(self.frame1, text="state", font=8)
+                l = tk.Label(self.frame1, text="state", font=8 , relief=tk.RIDGE)
                 l.grid(row=0, column=0, stick="nsew")
                 continue
-            l = tk.Label(self.frame1, text=row -1 , font=10)
+            l = tk.Label(self.frame1, text=row -1 , font=10 , relief=tk.RIDGE)
             l.grid(row=row , column= 0, stick="nsew")
         for row in range(self.rows):
             for column in range(self.columns):
