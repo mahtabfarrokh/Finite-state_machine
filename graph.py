@@ -15,6 +15,9 @@ class Graph () :
         self.start = False
         self.imageWidth =0
         self.imageHeight =0
+        self.mark = []
+        for i in range(self.stateNumber) :
+            self.mark.append(0)
 
         self.root = tk.Toplevel()
 
@@ -126,8 +129,9 @@ class Graph () :
         self.e.bind('<Return>', self.findString)
 
         #find loop :
-        self.visited = []
-        loop =  self.findLoop(0)
+        self.visited.clear()
+        loop =  self.findLoop()
+        loop = True
         if loop :
            l2 = tk.Label(self.frame3, text="There is loop", font=8)
            l2.grid(row=1, column=0, sticky="nsew")
@@ -136,26 +140,36 @@ class Graph () :
         else :
             l = tk.Label(self.frame3, text="There is not loop", font=8)
             l.grid(row=1 , column=0, sticky="nsew")
-    def dfs (self , i)  :
+
+    def dfs(self, i):
         self.visited.append(i)
-        j=0
-        for ver in self.list[i] :
-            if ( ver is not '') :
-                 if(j in self.visited):
-                     v = self.list[i]
-                     v[j] = ''
-                     return False
-                 else:
-                     self.dfs(j)
-            j +=1
+        self.mark[i] = 1
+        j = 0
+        for ver in self.list[i]:
+            if (ver is not ''):
+                if (self.mark[j]==1):
+                    v = self.list[i]
+                    v[j] = ''
+                    return False
+                else:
+                    self.dfs(j)
+            j += 1
+        self.mark[i] = 2
         return True
-    def deleteLoopNode (self , i ) :
-        self.visited = []
-        while not self.dfs(i) :
-            self.visited = []
+
+    def deleteLoopNode(self, i):
+        self.mark = [0]* self.stateNumber
+        self.dfs(i)
+        self.visited.clear()
+
     def deleteLoop (self) :
-        self.deleteLoopNode(int(self.startState))
+
         for i in range(self.stateNumber) :
+            k = self.list[i]
+            k[i] = '0'
+            print("list : " , k)
+        self.deleteLoopNode(int(self.startState))
+        for i in range(self.stateNumber):
             self.deleteLoopNode(int(i))
         self.makeDotFile()
         self.adjacentListDraw()
@@ -163,13 +177,27 @@ class Graph () :
         l.grid(row=1, column=0, sticky="nsew")
         self.b.destroy()
 
-    def findLoop (self , i ) :
 
+    def loopDFS (self , i ) :
         self.visited.append(i)
-        for neighbour in self.adjacent[i] :
-            if(int(neighbour.state) in self.visited) :
+        self.mark[i] = 1
+        j = 0
+        for ver in self.list[i]:
+            if (ver is not ''):
+                if(self.mark[j] == 1):
+                    return False
+                else:
+                    self.dfs(j)
+            j += 1
+        self.mark[i] = 2
+        return True
+
+    def findLoop (self ) :
+
+        for i in range(int(self.stateNumber)) :
+            self.mark = [0] * self.stateNumber
+            if not self.loopDFS(int(i))  :
                 return True
-            self.findLoop(int(neighbour.state))
         return False
 
     def findPartOfString(self , currentState , eString) :
